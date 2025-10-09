@@ -1,0 +1,46 @@
+{
+    "name": "orders-sync",
+    "handle": "orders-sync",
+    "version": "1.0.0",
+    "description": "Sync your Qumra store orders automatically with Google Sheets or external systems.",
+    "author": {
+      "name": "Mustafa Mohamed",
+      "email": "dev@qumra.cloud"
+    },
+    "appUrl": "http://localhost:3000",
+    "oauth": {
+      "required": true,
+      "callback_path": "/auth/callback",
+      "scopes": [
+        "read_orders",
+        "write_orders",
+        "read_customers"
+      ]
+    },
+    "webhooks": [
+      {
+        "topic": "order/created",
+        "endpoint": "/webhooks/order-created"
+      },
+      {
+        "topic": "order/paid",
+        "endpoint": "/webhooks/order-paid"
+      }
+    ],
+    "extensions": [
+      {
+        "type": "admin_page",
+        "entry": "./extensions/admin-page/index.tsx",
+        "name": "Orders Sync Dashboard"
+      },
+      {
+        "type": "theme_widget",
+        "entry": "./extensions/order-status-widget/index.tsx",
+        "name": "Order Status Widget"
+      }
+    ],
+    "environment": {
+      "PORT": 3000,
+      "NODE_ENV": "development"
+    }
+  }
