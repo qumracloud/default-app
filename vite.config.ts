@@ -22,7 +22,6 @@ if (host === 'localhost') {
     clientPort: 443,
   };
 }
-console.log("🚀 ~ hmrConfig:", hmrConfig)
 
 export default defineConfig({
   server: {

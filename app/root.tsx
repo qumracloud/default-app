@@ -10,6 +10,8 @@ import {
 import type { Route } from "./+types/root";
 import "./app.css";
 import { useIframeNavigation } from "./utils/useIframeNavigation";
+import { ProgressBar } from "./components/ProgressBar";
+import { LoadingSpinner } from "./components/LoadingSpinner";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -35,6 +37,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
+        <ProgressBar />
+        <LoadingSpinner />
         {children}
         <ScrollRestoration />
         <Scripts />

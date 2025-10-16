@@ -42,8 +42,8 @@
   ],
 
   "pages": [
-    { "path": "/app", "title": "Home" },
-    { "path": "/app/additional", "title": "Additional Page" }
+    { "path": "/app", "label": "Home" },
+    { "path": "/app/additional", "label": "Additional Page" }
   ],
 
   "environment": {
