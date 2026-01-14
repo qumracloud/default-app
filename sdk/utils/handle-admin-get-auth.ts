@@ -3,6 +3,7 @@ import { verifyRequestHmac } from "../helpers/verify-request-hmac";
 import { verifyJwt } from "../helpers/verify-jwt";
 import { AUTH_URL } from "sdk/constant/api.constant";
 import { getAdminGraphql } from "./get-admin-graphql";
+import { isIframeRequest } from "sdk/validations/is-iframe-request";
 
 export async function handleAdminGetAuth(
   request: Request,
@@ -27,14 +28,14 @@ export async function handleAdminGetAuth(
   }
 
   // 🗄️ Check existing session
-  console.log("🚀 ~ handleAdminGetAuth ~ DATA @@##:", await client.sessionStorage.session.findMany())
   const session = await client.sessionStorage.session.findUnique({
     where: { store },
   });
-  console.log("🚀 ~ handleAdminGetAuth ~ where.store:", store)
-  console.log("🚀 ~ handleAdminGetAuth ~ session:", session)
+
   
   if (session) {
+    isIframeRequest(request)
+
     await client.sessionStorage.session.update({
       where: { store },
       data: {

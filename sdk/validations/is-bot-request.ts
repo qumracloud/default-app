@@ -31,12 +31,10 @@ export function isBotRequest(request: Request): boolean {
 
   const userAgent = headers.get("user-agent") ?? '';
   const accept = headers.get("accept");
-  const cookie = headers.get("cookie");
 
   failIfBot(!userAgent, "Missing User-Agent");
   failIfBot(isBotUserAgent(userAgent), "Bot User-Agent detected");
   failIfBot(!accept, "Missing Accept header");
-  failIfBot(!cookie, "Missing Cookie");
 
   return false; 
 }

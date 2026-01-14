@@ -1,7 +1,6 @@
 import { isBotRequest } from "sdk/validations/is-bot-request";
 import { handleAdminGetAuth } from "./handle-admin-get-auth";
 import { handleAdminPostAuth } from "./handle-admin-post-auth";
-import { isIframeRequest } from "sdk/validations/is-iframe-request";
 
 export async function adminAuthenticate({
   request,
@@ -9,7 +8,6 @@ export async function adminAuthenticate({
 }: AdminAuthParams): Promise<AdminAuthResult> {
   //! TODO checker logic
     isBotRequest(request)  
-    isIframeRequest(request)
 
 
   if (request.method === "GET") {
