@@ -1,0 +1,26 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Session {
+  id            String   @id @unique @default(cuid())
+  store         String   @unique
+  isOnline      Boolean  @default(false)
+  accessToken   String
+  userId        String?
+  firstName     String?
+  lastName      String?
+  email         String?
+  emailVerified Boolean? @default(false)
+  refreshToken  String?
+  createdAt     DateTime @default(now())
+  lastSeenAt    DateTime @default(now())
+}

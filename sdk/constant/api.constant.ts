@@ -1,0 +1,1 @@
+export const AUTH_URL = "https://api.qumra.cloud/v1/apps/auth/token"
