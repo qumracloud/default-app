@@ -4,90 +4,91 @@ import { verifyJwt } from "../helpers/verify-jwt";
 import { AUTH_URL } from "sdk/constant/api.constant";
 import { getAdminGraphql } from "./get-admin-graphql";
 import { isIframeRequest } from "sdk/validations/is-iframe-request";
+import { invariantChecker } from "sdk/helpers/in-variant-checker";
 
 export async function handleAdminGetAuth(
   request: Request,
   client: QumraClient
 ): Promise<AdminAuthGetResult | Response> {
   const url = new URL(request.url);
-  const searchParams = url.searchParams;
+  const params = url.searchParams;
 
-  const store = searchParams.get("store");
-  const code = searchParams.get("code");
-  const token = searchParams.get("id_token");
+  const store = params.get("store");
+  const code = params.get("code");
+  const token = params.get("id_token");
+  const operation = params.get("operation") as
+    | "authorize"
+    | "launch";
 
-  if (!store) {
-    throw new Error("Invalid store");
-  }
+  invariantChecker(store, "Invalid store");
+  invariantChecker(
+    verifyRequestHmac(request, client.secretKey),
+    "Hmac is invalid",
+    401
+  );
 
-  const redirectUrl = `https://app.qumra.cloud/store/${store?.split(".")[0]}`;
+  /**
+   * =========================
+   * AUTHORIZE FLOW
+   * =========================
+   */
+  if (operation === "authorize") {
+    invariantChecker(code, "Authorization code is missing");
 
-  // 🔐 Verify HMAC
-  if (!verifyRequestHmac(request, client.secretKey)) {
-    throw new Error("Hmac is invalid");
-  }
+    const authResponse = await client.request<{
+      data: { access_token: string; callbackUrl: string };
+    }>({
+      url: AUTH_URL,
+      method: "POST",
+      body: {
+        client_id: client.apiKey,
+        client_secret: client.secretKey,
+        code,
+      },
+    });
 
-  // 🗄️ Check existing session
-  const session = await client.sessionStorage.session.findUnique({
-    where: { store },
-  });
+    invariantChecker(authResponse.data.access_token, "Access token is missing");
 
-  
-  if (session) {
-    isIframeRequest(request)
-
-    await client.sessionStorage.session.update({
+    await client.sessionStorage.session.upsert({
       where: { store },
-      data: {
+      update: {
+        accessToken: authResponse.data.access_token,
+        isOnline: true,
+        lastSeenAt: new Date(),
+      },
+      create: {
+        store,
+        accessToken: authResponse.data.access_token,
         isOnline: true,
         lastSeenAt: new Date(),
       },
     });
-    
-      // 🪪 Optional JWT
-    const decodedToken = verifyJwt(token, client.secretKey);
-     if (!decodedToken) {
-       throw new Error("Token is invalid");
-     }
-   
-    
-    return {
-      admin: getAdminGraphql(client, session, store),
-      session,
-      data: decodedToken,
-      store
-    };
+
+    throw Response.redirect(authResponse.data.callbackUrl, 302);
   }
 
-  if (!code) {
-    throw new Error("Authorization code is missing");
-  }
+  /**
+   * =========================
+   * LAUNCH FLOW
+   * =========================
+   */
+  invariantChecker(token, "ID token is missing");
 
-  const authResponse = await client.request<{
-    data: { access_token: string; callbackUrl: string };
-  }>({
-    url: AUTH_URL,
-    method: "POST",
-    body: {
-      client_id: client.apiKey,
-      client_secret: client.secretKey,
-      code,
-    },
+  isIframeRequest(request);
+
+  const decodedToken = verifyJwt(token, client.secretKey);
+  invariantChecker(decodedToken, "Token is invalid", 401);
+
+  const session = await client.sessionStorage.session.findUnique({
+    where: { store },
   });
+  invariantChecker(session, "Session not found", 404);
 
-  if (!authResponse.data.access_token) {
-    throw new Error("Access token is missing");
-  }
-
-  await client.sessionStorage.session.create({
-    data: {
-      store,
-      accessToken: authResponse.data.access_token,
-      isOnline: true,
-      createdAt: new Date(),
-      lastSeenAt: new Date(),
-    },
-  });
-
-  throw Response.redirect(authResponse.data.callbackUrl, 302);
+  return {
+    admin: getAdminGraphql(client, session, store),
+    session,
+    data: decodedToken,
+    store,
+  };
 }
+

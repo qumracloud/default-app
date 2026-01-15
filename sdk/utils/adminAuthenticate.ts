@@ -7,8 +7,7 @@ export async function adminAuthenticate({
   client,
 }: AdminAuthParams): Promise<AdminAuthResult> {
   //! TODO checker logic
-    isBotRequest(request)  
-
+  isBotRequest(request);
 
   if (request.method === "GET") {
     return handleAdminGetAuth(request, client);
