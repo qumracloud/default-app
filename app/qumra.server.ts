@@ -10,7 +10,7 @@ import prisma  from "../prisma/lib/prisma";
 const Qumra = qumraApp({
   apiKey: process.env.QUMRA_API_KEY as string, // client_id
   secretKey: process.env.QUMRA_API_SECRET as string, // client_secret
-  sessionStorage: new PrismaSessionStorage({ session: prisma }),
+  sessionStorage: new PrismaSessionStorage(prisma),
   appUrl: process.env.QUMRA_APP_URL as string,
 
 });
