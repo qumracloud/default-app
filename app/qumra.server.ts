@@ -1,15 +1,20 @@
-import { prisma } from "prisma/lib/prisma";
-import { QumraClient } from "sdk/client";
+import { qumraApp } from "@qumra/app-react-router";
+import { PrismaSessionStorage } from "@qumra/app-session-storage-prisma";
+import prisma  from "../prisma/lib/prisma";
 // Initialize the client with your credentials
 // In a real app, use environment variables like process.env.QUMRA_API_KEY
 
-const Qumra = new QumraClient({
+// apiKey: process.env.QUMRA_API_KEY as string, // client_id
+// secretKey: process.env.QUMRA_API_SECRET as string, // client_secret
+// sessionStorage: prisma
+const Qumra = qumraApp({
   apiKey: process.env.QUMRA_API_KEY as string, // client_id
   secretKey: process.env.QUMRA_API_SECRET as string, // client_secret
-  sessionStorage: prisma
+  sessionStorage: new PrismaSessionStorage({ session: prisma }),
+  appUrl: process.env.QUMRA_APP_URL as string,
+
 });
 
 export default Qumra;
 
-export const query = Qumra.request;
 export const authenticate = Qumra.authenticate;
