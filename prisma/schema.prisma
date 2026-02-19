@@ -2,25 +2,25 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
-
 datasource db {
   provider = "sqlite"
+  url      = "file:dev.db"
 }
-
 model Session {
-  id            String   @id @unique @default(cuid())
-  store         String   @unique
-  isOnline      Boolean  @default(false)
+  id            String    @id @unique @default(cuid())
+  store         String    @unique
+  isOnline      Boolean   @default(false)
   accessToken   String
+  scope         String?
+  expires       DateTime?
   userId        String?
   firstName     String?
   lastName      String?
   email         String?
-  emailVerified Boolean? @default(false)
+  emailVerified Boolean?  @default(false)
   refreshToken  String?
-  createdAt     DateTime @default(now())
-  lastSeenAt    DateTime @default(now())
+  createdAt     DateTime  @default(now())
+  lastSeenAt    DateTime  @default(now())
 }
