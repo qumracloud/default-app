@@ -9,14 +9,10 @@
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {
-<<<<<<< HEAD
     "@prisma/adapter-better-sqlite3": "^7.2.0",
     "@qumra/app-react-router": "^1.0.5",
-=======
     "@prisma/client": "^5.22.0",
-    "@qumra/app-react-router": "^1.0.2",
     "@qumra/app-sdk": "^0.3.2",
->>>>>>> 991b0ebe0017e5e18b52984a75ac679529f9e9eb
     "@qumra/app-session-storage-prisma": "^1.0.2",
     "@react-router/fs-routes": "^7.9.4",
     "@react-router/node": "^7.9.2",
